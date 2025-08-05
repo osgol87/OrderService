@@ -4,6 +4,8 @@ import com.speedsneakers.orderservice.model.dto.OrderDto;
 import com.speedsneakers.orderservice.model.request.OrderRequestModel;
 import com.speedsneakers.orderservice.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,7 @@ public class OrderController {
      *
      * @param orderService Servicio de órdenes.
      */
+    @Autowired
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
