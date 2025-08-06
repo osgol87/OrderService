@@ -1,5 +1,5 @@
 server:
-  port: ${ORDERSERVICE_PORT:0}
+  port: ${ORDERSERVICE_PORT:8082}
 
 spring:
   application:
@@ -13,7 +13,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: ${ORDERSERVICE_SHOW_SQL:false}
     hibernate:
-      ddl-auto: ${PRODUCTSERVICE_DDL_AUTO:validate}
+      ddl-auto: ${ORDERSERVICE_DDL_AUTO:validate}
 
 eureka:
   client:
