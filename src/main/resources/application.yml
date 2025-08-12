@@ -18,7 +18,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_URL:https://discovery-service-a9bkgpgaf0hvb3d8.centralus-01.azurewebsites.net}
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
   instance:
     instance-id: ${spring.application.name}:${random.value}
     prefer-ip-address: true
