@@ -24,6 +24,11 @@ public class OrderItemDto {
     private Long productId;
 
     /**
+     * Nombre del producto.
+     */
+    private String name;
+
+    /**
      * Cantidad del producto.
      */
     private Integer quantity;
@@ -39,6 +44,11 @@ public class OrderItemDto {
     private BigDecimal subtotal;
 
     /**
+     * URL de la imagen del producto.
+     */
+    private String imageUrl;
+
+    /**
      * Convierte el item de la orden a una representación de cadena.
      *
      * @return String representation of the OrderItemDto.
@@ -48,9 +58,11 @@ public class OrderItemDto {
         return "{" +
                 "id=" + id +
                 ", productId=" + productId +
+                ", name='" + name + "'" +
                 ", quantity=" + quantity +
                 ", pricePerUnit=" + pricePerUnit +
                 ", subtotal=" + subtotal +
+                ", imageUrl='" + imageUrl + "'" +
                 '}';
     }
 }

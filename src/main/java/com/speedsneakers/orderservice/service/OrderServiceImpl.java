@@ -13,12 +13,14 @@ import com.speedsneakers.orderservice.model.request.OrderRequestModel;
 import com.speedsneakers.orderservice.repository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -73,26 +75,45 @@ public class OrderServiceImpl implements OrderService {
             // Validamos que el producto exista en el servicio de productos.
             ProductResponseDto productResponse = productClient.getProductById(itemRequest.getProductId());
 
-            OrderItem orderItem = new OrderItem();
-            orderItem.setProductId(itemRequest.getProductId());
-            orderItem.setQuantity(itemRequest.getQuantity());
-            orderItem.setPricePerUnit(productResponse.getPrice());
+            OrderItem orderItem = getOrderItem(itemRequest, productResponse, totalAmount);
 
-            BigDecimal subtotal = totalAmount.add(
-                    productResponse.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQuantity()))
-            );
-
-            orderItem.setSubtotal(subtotal);
-            
             // Centralizamos la lógica de la relación en un solo metodo.
             order.addOrderItem(orderItem);
         }
 
-        order.setTotalAmount(totalAmount);
+        order.setTotalAmount(
+                order.getOrderItems().stream()
+                        .map(OrderItem::getSubtotal)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
 
         orderRepository.save(order);
 
-        return convertToDto(order);
+        return convertToDtoWithDetails(order);
+    }
+
+    /**
+     * Crea un OrderItem a partir de la solicitud y la respuesta del producto.
+     *
+     * @param itemRequest Modelo con los datos del item de la orden
+     * @param productResponse Modelo con los datos del producto
+     * @param totalAmount Monto total acumulado de la orden
+     * @return OrderItem con los datos del item de la orden
+     */
+    private static OrderItem getOrderItem(OrderItemRequestModel itemRequest, ProductResponseDto productResponse, BigDecimal totalAmount) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setProductId(itemRequest.getProductId());
+        orderItem.setName(productResponse.getName());
+        orderItem.setQuantity(itemRequest.getQuantity());
+        orderItem.setPricePerUnit(productResponse.getPrice());
+        orderItem.setImageUrl(productResponse.getImageUrl());
+
+        BigDecimal subtotal = totalAmount.add(
+                productResponse.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQuantity()))
+        );
+
+        orderItem.setSubtotal(subtotal);
+        return orderItem;
     }
 
     /**
@@ -115,7 +136,20 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderNotFoundException(id);
         }
 
-        return convertToDto(optionalOrder.get());
+        return convertToDtoWithDetails(optionalOrder.get());
+    }
+
+    /**
+     * Obtiene todas las órdenes.
+     *
+     * @return Lista de todas las órdenes.
+     */
+    @Override
+    public List<OrderDto> getAllOrders() {
+        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "orderDate"))
+                .stream()
+                .map(this::convertToDto)
+                .toList();
     }
 
     /**
@@ -125,6 +159,22 @@ public class OrderServiceImpl implements OrderService {
      * @return OrderDto con los datos de la orden.
      */
     private OrderDto convertToDto(Order order) {
+
+        return new OrderDto(
+                order.getId(),
+                order.getOrderDate(),
+                order.getStatus().toString(),
+                order.getTotalAmount()
+        );
+    }
+
+    /**
+     * Convierte una entidad Order a un DTO OrderDto.
+     *
+     * @param order Entidad Order a convertir.
+     * @return OrderDto con los datos de la orden.
+     */
+    private OrderDto convertToDtoWithDetails(Order order) {
 
         OrderDto orderDto = new OrderDto(
                 order.getId(),
@@ -137,15 +187,16 @@ public class OrderServiceImpl implements OrderService {
             OrderItemDto itemRequest = new OrderItemDto(
                     item.getId(),
                     item.getProductId(),
+                    item.getName(),
                     item.getQuantity(),
                     item.getPricePerUnit(),
-                    item.getSubtotal()
+                    item.getSubtotal(),
+                    item.getImageUrl()
             );
             // Añadimos el item a la orden DTO
             orderDto.addOrderItem(itemRequest);
         }
 
-        log.info("Orden creada con éxito: {}", orderDto);
         return orderDto;
     }
 }

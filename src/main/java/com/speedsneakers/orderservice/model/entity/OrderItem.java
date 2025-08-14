@@ -47,6 +47,18 @@ public class OrderItem {
     private Long productId;
 
     /**
+     * Nombre del producto
+     */
+    @Column(name = "name")
+    private String name;
+
+    /**
+     * Url de la imagen del producto
+     */
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    /**
      * Cantidad del producto
      */
     @Column(name = "quantity")
@@ -73,9 +85,11 @@ public class OrderItem {
         return "{" +
                 "id=" + id +
                 ", productId=" + productId +
+                ", name='" + name + "'" +
                 ", quantity=" + quantity +
                 ", pricePerUnit=" + pricePerUnit +
                 ", subtotal=" + subtotal +
+                ", imageUrl='" + imageUrl + "'" +
                 '}';
     }
 }

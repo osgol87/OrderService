@@ -3,6 +3,8 @@ package com.speedsneakers.orderservice.service;
 import com.speedsneakers.orderservice.model.dto.OrderDto;
 import com.speedsneakers.orderservice.model.request.OrderRequestModel;
 
+import java.util.List;
+
 /**
  * Interfaz del servicio de órdenes.
  * Proporciona métodos para crear y obtener órdenes.
@@ -24,4 +26,11 @@ public interface OrderService {
      * @return Detalles de la orden.
      */
     OrderDto getOrderById(String orderId);
+
+    /**
+     * Obtiene todas las órdenes.
+     *
+     * @return Lista de todas las órdenes.
+     */
+    List<OrderDto> getAllOrders();
 }
