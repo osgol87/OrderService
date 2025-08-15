@@ -11,9 +11,9 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: ${ORDERSERVICE_SHOW_SQL:false}
+    show-sql: ${ORDERSERVICE_SHOW_SQL:true}
     hibernate:
-      ddl-auto: ${ORDERSERVICE_DDL_AUTO:validate}
+      ddl-auto: ${ORDERSERVICE_DDL_AUTO:create}
 
 eureka:
   client:
